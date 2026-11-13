@@ -32,53 +32,16 @@ function realUrl(rewritten) {
   }
 }
 
-// ---- Host-scoped User-Agent alignment ----
-// Microsoft's fraud checks compare the HTTP User-Agent against the real
-// browser. Login hosts must see the REAL UA; Xbox hosts get a desktop
-// Edge UA (which is also what unlocks the 1080p stream tier).
-const EDGE_UA =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0";
-const AUTH_SUFFIXES = [
-  "live.com",
-  "microsoftonline.com",
-  "microsoft.com",
-  "msauth.net",
-  "msftauth.net",
-  "windows.net",
-  "gfx.ms",
-  "s-microsoft.com",
-];
-const XBOX_SUFFIXES = [
-  "xbox.com",
-  "xboxlive.com",
-  "xboxservices.com",
-  "xboxab.com",
-  "gamepass.com",
-  "msecnd.net",
-  "azureedge.net",
-  "aspnetcdn.com",
-];
-function hostMatches(host, suffixes) {
-  host = String(host || "").toLowerCase();
-  return suffixes.some((s) => host === s || host.endsWith("." + s));
-}
+// ---- User-Agent handling ----
+// The browser's REAL User-Agent is used on every host. An earlier build
+// sent a desktop Edge UA to Xbox hosts for a quality boost, but the UA
+// mismatch between the sign-in (real UA) and Xbox API calls (Edge UA)
+// broke the session and caused a black-screen reload loop after login.
+// Consistency beats the boost; the stream may top out at 720p.
 function alignHeaders(remote, headers) {
-  const host = remote.hostname || "";
   const pairs = Array.isArray(headers) ? headers.slice() : [];
   const hasUA = pairs.some(([k]) => String(k).toLowerCase() === "user-agent");
-  if (hostMatches(host, AUTH_SUFFIXES)) {
-    // Real browser UA only. If Scramjet didn't forward one, add it so the
-    // upstream never sees a server default.
-    if (!hasUA) pairs.push(["user-agent", navigator.userAgent]);
-    return pairs;
-  }
-  if (hostMatches(host, XBOX_SUFFIXES)) {
-    const rest = pairs.filter(
-      ([k]) => String(k).toLowerCase() !== "user-agent"
-    );
-    rest.push(["user-agent", EDGE_UA]);
-    return rest;
-  }
+  if (!hasUA) pairs.push(["user-agent", navigator.userAgent]);
   return pairs;
 }
 function wrapTransport(bare) {
@@ -246,6 +209,20 @@ $("completeBtn").onclick = () => {
 // ---- Toolbar ----
 $("reloadBtn").onclick = () => {
   if (frame) frame.go(lastRealUrl || XBOX_URL);
+};
+$("resetBtn").onclick = async () => {
+  if (!confirm("Reset the proxy? This clears the saved sign-in and reloads.")) return;
+  try {
+    const regs = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(regs.map((r) => r.unregister()));
+    const keys = await caches.keys();
+    await Promise.all(keys.map((k) => caches.delete(k)));
+    localStorage.clear();
+    sessionStorage.clear();
+  } catch (e) {
+    /* best effort */
+  }
+  location.reload();
 };
 $("fsBtn").onclick = () => {
   if (!iframe) return;
