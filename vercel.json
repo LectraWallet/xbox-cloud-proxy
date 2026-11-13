@@ -1,0 +1,1 @@
+{"builds":[{"config":{"includeFiles":["public/**","node_modules/@mercuryworkshop/scramjet/**","node_modules/@mercuryworkshop/scramjet-controller/**","node_modules/@mercuryworkshop/scramjet-utils/**","node_modules/@mercuryworkshop/bare-transport/**"]},"src":"server.js","use":"@vercel/node"}],"regions":["iad1"],"routes":[{"dest":"server.js","src":"/(.*)"}],"version":2}

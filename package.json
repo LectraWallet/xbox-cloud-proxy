@@ -1,0 +1,1 @@
+{"dependencies":{"@mercuryworkshop/bare-transport":"1.0.0","@mercuryworkshop/scramjet":"2.0.67-alpha.2","@mercuryworkshop/scramjet-controller":"0.0.14","@mercuryworkshop/scramjet-utils":"0.0.3","@tomphttp/bare-server-node":"^2.0.6","express":"^4.18.2","ipaddr.js":"^2.5.0"},"name":"xbox-cloud-proxy","type":"module","version":"1.0.0"}
