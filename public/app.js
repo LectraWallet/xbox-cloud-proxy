@@ -7,6 +7,7 @@ const XBOX_URL = "https://www.xbox.com/en-US/play";
 const statusEl = $("status");
 
 function setStatus(t, err) {
+  statusEl.style.display = "";
   statusEl.textContent = t;
   statusEl.className = err ? "err" : "";
 }
@@ -315,7 +316,7 @@ async function init() {
 
     setStatus("loading Xbox Cloud Gaming…");
     frame.go(XBOX_URL);
-    setStatus("ready — if sign-in breaks, use 🔑 Login Fix");
+    statusEl.style.display = "none";
   } catch (e) {
     setStatus("failed: " + e.message, true);
   }
