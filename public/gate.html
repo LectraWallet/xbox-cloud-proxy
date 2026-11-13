@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" href="data:," />
+<title>Enter PIN</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0c0c0c; color: #fff; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; }
+  .box { text-align: center; padding: 24px; }
+  h1 { font-size: 20px; margin-bottom: 6px; }
+  p { color: #999; font-size: 13px; margin-bottom: 18px; }
+  input { background: #1a1a1a; border: 1px solid #444; color: #fff; border-radius: 10px; padding: 12px 14px; font-size: 18px; text-align: center; width: 200px; letter-spacing: 6px; outline: none; }
+  input:focus { border-color: #107c10; }
+  button { display: block; margin: 14px auto 0; background: #107c10; color: #fff; border: none; border-radius: 999px; padding: 10px 28px; font-size: 15px; cursor: pointer; }
+  #err { color: #ff6b6b; font-size: 13px; margin-top: 12px; min-height: 18px; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>✕ Xbox Cloud Gaming</h1>
+  <p>Enter the PIN to continue</p>
+  <input id="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="32" placeholder="••••" />
+  <button id="go">Unlock</button>
+  <div id="err"></div>
+</div>
+<script>
+  const pinEl = document.getElementById('pin');
+  const errEl = document.getElementById('err');
+  async function unlock() {
+    errEl.textContent = '';
+    const r = await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pin: pinEl.value }),
+    });
+    if (r.ok) location.href = '/';
+    else { errEl.textContent = 'Wrong PIN.'; pinEl.value = ''; pinEl.focus(); }
+  }
+  document.getElementById('go').onclick = unlock;
+  pinEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') unlock(); });
+  pinEl.focus();
+</script>
+</body>
+</html>
