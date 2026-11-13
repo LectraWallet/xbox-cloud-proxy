@@ -130,6 +130,14 @@ const XBOX_SUFFIXES = [
   "msecnd.net",
   "azureedge.net",
   "aspnetcdn.com",
+  // Asset/telemetry hosts the Xbox app itself loads (fonts, monitoring,
+  // analytics). No URL bar exists, so the proxy stays Xbox-only.
+  "monitor.azure.com",
+  "fonts.googleapis.com",
+  "fonts.gstatic.com",
+  "gstatic.com",
+  "google-analytics.com",
+  "googletagmanager.com",
 ];
 
 const bareServer = createBareServer("/bare/", {
